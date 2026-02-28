@@ -1,0 +1,27 @@
+# ── ML model files (generate locally, copy here before deploy) ────────────────
+models/*.pkl
+models/*.joblib
+models/*.json
+models/*.csv
+# Keep models/README.md
+!models/README.md
+
+# ── Environment & secrets ──────────────────────────────────────────────────────
+.env
+.env.local
+*.env
+
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+.venv/
+venv/
+env/
+
+# ── OS ────────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
