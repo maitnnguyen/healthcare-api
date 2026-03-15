@@ -1,41 +1,26 @@
 """
-main.py
-───────
-Healthcare API — FastAPI application
+main.py — Healthcare API v1.2
 """
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 from routers import heart_disease
-#from routers import cancer_risk, admissions
 
 app = FastAPI(
     title="Healthcare API",
     description="""
 ## 🏥 Healthcare Prediction API
 
-A modular FastAPI service serving ML-powered healthcare risk predictions.
-Built on harmonized clinical data from the [ehr-fhir-pipeline](https://github.com/maitnnguyen/ehr-fhir-pipeline).
-
-### Available Models
-| Endpoint prefix     | Model                        | Status  |
-|---------------------|------------------------------|---------|
-| `/heart-disease`      | Heart Disease Prediction     | ✅ Live |
-| `/cancer-risk`      | Cancer Risk Classification   | 🔜 Soon |
-| `/admissions`       | 30-day Readmission Prediction| 🔜 Soon |
-| `/diabetes`         | Diabetes Risk                | 🔜 Soon |
-
-### Power BI Integration
-| Dashboard Page | Connect to | Status |
-|---|---|---|
-| Heart Disease  | `/heart-disease/data` | ✅ Live |
-| Cancer Risk    | `/cancer-risk/data` | 🔜 Soon |
-| Readmissions   | `/admissions/data`  | 🔜 Soon |
+| Endpoint prefix   | Model         | Status     |
+|-------------------|---------------|------------|
+| `/heart-disease`  | Heart Disease | ✅ Live    |
+| `/cancer-risk`    | Cancer Risk   | 🔜 Soon   |
+| `/icu-mortality`  | ICU Mortality | 🔜 Soon   |
 """,
-    version="1.1.0",
+    version="1.2.0",
     contact={"name": "Mai Nguyen", "url": "https://github.com/maitnnguyen"},
-    license_info={"name": "MIT"},
 )
 
 app.add_middleware(
@@ -45,18 +30,30 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ── Routers ───────────────────────────────────────────────────────────────────
 app.include_router(heart_disease.router)
-#app.include_router(cancer_risk.router) # comming soon
-#app.include_router(admissions.router) # coming soon
-# app.include_router(diabetes.router)  # coming soon
 
-# ── Root ──────────────────────────────────────────────────────────────────────
-@app.get("/", tags=["Health"])
-async def root():
+# ── Serve static files ────────────────────────────────────────────────────────
+static_dir = Path(__file__).parent / "static"
+static_dir.mkdir(exist_ok=True)
+app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
+
+# ── Dashboard UI ──────────────────────────────────────────────────────────────
+@app.get("/", response_class=HTMLResponse, tags=["UI"])
+async def dashboard():
+    html_file = Path(__file__).parent / "static" / "index.html"
+    if html_file.exists():
+        return HTMLResponse(html_file.read_text())
+    return HTMLResponse("<h1>Healthcare API</h1><p><a href='/docs'>Swagger Docs</a></p>")
+
+@app.get("/health", tags=["Health"])
+async def health():
+    return {"status": "healthy"}
+
+@app.get("/api", tags=["Health"])
+async def api_info():
     return {
         "service": "Healthcare API",
-        "version": "1.1.0",
+        "version": "1.2.0",
         "status":  "healthy",
         "docs":    "/docs",
         "models": {
@@ -67,13 +64,8 @@ async def root():
             },
         },
         "coming_soon": [
-                "/diabetes/predict",
-		"/icu-mortality/predict",
-		"/admissions/predict",
+            "/cancer-risk/predict",
+            "/icu-mortality/predict",
         ],
         "github": "https://github.com/maitnnguyen/healthcare-api",
     }
-
-@app.get("/health", tags=["Health"])
-async def health_check():
-    return {"status": "healthy"}

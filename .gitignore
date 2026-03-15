@@ -1,5 +1,5 @@
 # ── ML model files (generate locally, copy here before deploy) ────────────────
-models/*.pkl
+#models/*.pkl
 models/*.joblib
 models/*.json
 models/*.csv
@@ -24,6 +24,9 @@ build/
 .venv/
 venv/
 env/
+
+# Test scripts
+test_*.py
 
 # ── OS ────────────────────────────────────────────────────────────────────────
 .DS_Store
