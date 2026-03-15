@@ -3,6 +3,9 @@ models/*.pkl
 models/*.joblib
 models/*.json
 models/*.csv
+!models/heart_disease_model.pkl        # ← force include
+!models/heart_disease_metadata.json
+!models/heart_disease_sample_data.csv
 # Keep models/README.md
 !models/README.md
 
